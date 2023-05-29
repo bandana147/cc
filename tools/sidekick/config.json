@@ -51,13 +51,24 @@
     {
       "containerId": "tools",
       "id": "locales",
-      "title": "Locales",
+      "title": "Localessss",
       "environments": [ "edit", "dev", "preview", "live" ],
       "isPalette": true,
       "passConfig": true,
       "passReferrer": true,
       "paletteRect": "top: auto; bottom: 25px; left: 75px; height: 388px; width: 360px;",
       "url": "https://milo.adobe.com/tools/locale-nav",
+      "includePaths": [ "**.docx**" ]
+    },
+    {
+      "containerId": "tools",
+      "id": "version-history",
+      "title": "Version History",
+      "environments": [ "edit" ],
+      "url": "http://localhost:3000/tools/version-history/index-pallete.html?project=milo--adobecom",
+      "isPalette": true,
+      "passReferrer": true,
+      "paletteRect": "top: 50%; left: 50%; height: 80vh; width: 80vw; transform: translate(-50%, -50%);",
       "includePaths": [ "**.docx**" ]
     }
   ]
