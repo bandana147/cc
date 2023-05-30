@@ -51,7 +51,7 @@
     {
       "containerId": "tools",
       "id": "locales",
-      "title": "Localessss",
+      "title": "Locales",
       "environments": [ "edit", "dev", "preview", "live" ],
       "isPalette": true,
       "passConfig": true,
@@ -68,7 +68,7 @@
       "url": "http://localhost:3000/tools/version-history/index-pallete.html?project=milo--adobecom",
       "isPalette": true,
       "passReferrer": true,
-      "paletteRect": "top: 50%; left: 50%; height: 80vh; width: 80vw; transform: translate(-50%, -50%);",
+      "paletteRect": "top: auto; bottom: 20px; left: 20px; height: 398px; width: 360px;",
       "includePaths": [ "**.docx**" ]
     }
   ]
