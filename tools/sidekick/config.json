@@ -65,7 +65,7 @@
       "id": "version-history",
       "title": "Version History",
       "environments": [ "edit" ],
-      "url": "http://localhost:3000/tools/version-history/index-pallete.html?project=milo--adobecom",
+      "url": "http://localhost:3000/tools/version-history/index.html?project=milo--adobecom",
       "isPalette": true,
       "passReferrer": true,
       "paletteRect": "top: auto; bottom: 20px; left: 20px; height: 498px; width: 460px;",
