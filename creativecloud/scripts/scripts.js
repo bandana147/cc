@@ -12,6 +12,7 @@
 
 import { setLibs, decorateArea } from './utils.js';
 
+
 // Add project-wide style path here.
 const STYLES = '/creativecloud/styles/styles.css';
 
@@ -124,7 +125,7 @@ const locales = {
 const CONFIG = {
   contentRoot: '/cc-shared',
   codeRoot: '/creativecloud',
-  imsClientId: 'adobedotcom-cc',
+  imsClientId: 'milo',
   locales,
   geoRouting: 'on',
   prodDomains: ['www.adobe.com', 'helpx.adobe.com', 'business.adobe.com'],
