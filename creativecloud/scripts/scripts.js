@@ -125,7 +125,7 @@ const locales = {
 const CONFIG = {
   contentRoot: '/cc-shared',
   codeRoot: '/creativecloud',
-  imsClientId: 'milo',
+  imsClientId: 'fedsmilo',
   locales,
   geoRouting: 'on',
   prodDomains: ['www.adobe.com', 'helpx.adobe.com', 'business.adobe.com'],
