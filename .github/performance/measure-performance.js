@@ -448,7 +448,7 @@ function buildJsMatcherSpec(jsInclude) {
   return patterns.length ? { patterns } : null;
 }
 
-function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo) {
+function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo, variantName) {
   if (!Array.isArray(testUrls)) {
     console.error('testUrls must be an array');
     return [];
@@ -463,12 +463,20 @@ function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo) {
       if (urlType === 'cloud' && prBranch) {
         // Replace branch in the cloud URL and update org/repo for forks
         finalUrl = replaceBranchInUrl(item.url, prBranch, prOrg, prRepo);
-      } else if (urlType === 'milolibs' && milolibs && !item.skipMilolibs) {
-        // Add milolibs parameter
+      } else if (urlType === 'milolibs') {
         const urlObj = new URL(item.url);
-        urlObj.searchParams.set('milolibs', milolibs);
-        urlObj.searchParams.set('martech', 'off');
-        finalUrl = urlObj.toString();
+        if (variantName === 'Stage') {
+          // For base runs, strip milolibs to compare against main bundle
+          urlObj.searchParams.delete('milolibs');
+          finalUrl = urlObj.toString();
+        } else if (milolibs && !item.skipMilolibs) {
+          // Add milolibs parameter for PR runs when not explicitly skipped
+          urlObj.searchParams.set('milolibs', milolibs);
+          urlObj.searchParams.set('martech', 'off');
+          finalUrl = urlObj.toString();
+        } else {
+          finalUrl = urlObj.toString();
+        }
       }
       
       return { name: item.name || item.url, url: finalUrl, type: urlType };
@@ -516,7 +524,7 @@ async function main() {
   
   // Merge baseline URLs with PR-specific URLs
   const allTestUrls = [...testUrls, ...prTestUrls];
-  const urlsToTest = buildTestUrls(allTestUrls, baseUrl, milolibs, prBranch, prOrg, prRepo);
+  const urlsToTest = buildTestUrls(allTestUrls, baseUrl, milolibs, prBranch, prOrg, prRepo, variantName);
   
   // Build JS include matcher (optional)
   const jsMatcherSpec = buildJsMatcherSpec(jsInclude);

@@ -118,8 +118,20 @@ jobs:
               const line = body[i];
               if (!line.trim()) break;
               if (!/^\s*[-*]/.test(line)) break;
-              const url = line.replace(/^\s*[-*]\s*/, '').trim();
-              if (url) urls.push({ name: url, url, type: 'milolibs' });
+              const raw = line.replace(/^\s*[-*]\s*/, '').trim();
+              if (!raw) continue;
+              try {
+                const u = new URL(raw);
+                const hasMilolibs = u.searchParams.has('milolibs');
+                urls.push({
+                  name: u.toString(),
+                  url: u.toString(),
+                  type: hasMilolibs ? 'milolibs' : 'cloud',
+                  skipMilolibs: hasMilolibs, // keep PR milolibs as provided
+                });
+              } catch {
+                console.log(`Skipping invalid URL: ${raw}`);
+              }
             }
 
             console.log(`Found ${urls.length} PR-specific test URLs`);
