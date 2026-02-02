@@ -197,11 +197,11 @@ jobs:
               const hasStage = !!stageData;
               
               if (hasStage) {
-                comment += '| PR URL | Base URL | LCP (PR / Stage / Δ) | CLS (PR / Stage / Δ) | TBT (PR / Stage / Δ) | JS Size KB (PR / Stage / Δ) |\n';
-                comment += '|--------|----------|----------------------|----------------------|----------------------|------------------------------|\n';
+                comment += '| PR URL | Base URL | LCP ms (PR/Base/Δ) | CLS (PR/Base/Δ) | TBT ms (PR/Base/Δ) | JS KB (PR/Base/Δ) |\n';
+                comment += '|--------|----------|--------------------|-----------------|--------------------|-------------------|\n';
               } else {
-                comment += '| URL | LCP | CLS | TBT | JS Size |\n';
-                comment += '|-----|-----|-----|-----|---------|\n';
+                comment += '| URL | LCP ms | CLS | TBT ms | JS KB |\n';
+                comment += '|-----|--------|-----|--------|-------|\n';
               }
               
               const stageResults = hasStage ? stageData.results : [];
