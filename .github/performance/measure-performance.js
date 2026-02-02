@@ -442,8 +442,10 @@ async function main() {
   
   const milolibs = buildMilolibs();
   const prBranch = getPrBranch();
-  const prOrg = getPrOrg();
-  const prRepo = getPrRepo();
+  const variantName = process.env.VARIANT_NAME || 'PR';
+  // Keep stage URLs anchored to adobecom org/repo; only swap org/repo for PR runs
+  const prOrg = variantName === 'Stage' ? null : getPrOrg();
+  const prRepo = variantName === 'Stage' ? null : getPrRepo();
   const baseline = loadBaseline();
   const { thresholds, testUrls, runs = 3, throttle = 'none' } = baseline;
   
