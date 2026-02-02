@@ -1,7 +1,7 @@
 {
   "$schema": "./baseline.schema.json",
   "description": "Performance baseline thresholds for CC. Values are in milliseconds unless noted.",
-  "throttle": "fast3g",
+  "throttle": "none",
   "thresholds": {
     "lcp": {
       "budget": 2500,

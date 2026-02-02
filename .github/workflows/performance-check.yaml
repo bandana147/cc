@@ -197,8 +197,8 @@ jobs:
               const hasStage = !!stageData;
               
               if (hasStage) {
-                comment += '| URL | LCP (PR / Stage / Δ) | CLS (PR / Stage / Δ) | TBT (PR / Stage / Δ) | JS Size KB (PR / Stage / Δ) |\n';
-                comment += '|-----|----------------------|----------------------|----------------------|------------------------------|\n';
+                comment += '| PR URL | Base URL | LCP (PR / Stage / Δ) | CLS (PR / Stage / Δ) | TBT (PR / Stage / Δ) | JS Size KB (PR / Stage / Δ) |\n';
+                comment += '|--------|----------|----------------------|----------------------|----------------------|------------------------------|\n';
               } else {
                 comment += '| URL | LCP | CLS | TBT | JS Size |\n';
                 comment += '|-----|-----|-----|-----|---------|\n';
@@ -247,8 +247,13 @@ jobs:
                   : `${result?.jsSize}KB`;
                 
                 const urlVal = result?.url || base?.url || pageName;
+                const baseUrlVal = base?.url || '';
                 
-                comment += `| ${urlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                if (hasStage) {
+                  comment += `| ${urlVal} | ${baseUrlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                } else {
+                  comment += `| ${urlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                }
               }
               
               comment += '\n<details>\n<summary>📦 Heaviest resources (top 5 per page)</summary>\n\n';
