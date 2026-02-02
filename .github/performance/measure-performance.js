@@ -138,7 +138,9 @@ function collectMetrics(jsMatcherSpec) {
   const jsResources = [];
   
   for (const r of resources) {
-    const size = r.transferSize || 0;
+    // transferSize is 0 when the response is cached or cross-origin without TAO;
+    // fall back to encoded/decoded sizes to avoid reporting 0KB.
+    const size = r.transferSize || r.encodedBodySize || r.decodedBodySize || 0;
     totalSize += size;
     
     if ((r.initiatorType === 'script' || r.name.endsWith('.js')) && matchesJs(r.name)) {
