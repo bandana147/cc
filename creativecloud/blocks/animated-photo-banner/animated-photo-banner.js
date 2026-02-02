@@ -258,7 +258,7 @@ function overrideForReducedMotion(paramsList, headerParams) {
   if (headerParams) {
     Object.keys(headerParams).forEach((viewport) => {
       if (headerParams[viewport]) {
-        // Make header appear immediately
+        // Make header appear immediately.
         headerParams[viewport].wave = 0;
       }
     });
