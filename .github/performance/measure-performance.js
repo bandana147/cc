@@ -357,10 +357,24 @@ function getPrBranch() {
 }
 
 /**
+ * Get the PR org (fork owner) if available
+ */
+function getPrOrg() {
+  return process.env.PR_ORG || null;
+}
+
+/**
+ * Get the PR repo if available
+ */
+function getPrRepo() {
+  return process.env.PR_REPO || null;
+}
+
+/**
  * Replace the branch in an AEM cloud URL
  * URL format: https://{branch}--{repo}--{org}.aem.live/...
  */
-function replaceBranchInUrl(url, newBranch) {
+function replaceBranchInUrl(url, newBranch, newOrg, newRepo) {
   const urlObj = new URL(url);
   const hostParts = urlObj.hostname.split('.');
   
@@ -369,8 +383,10 @@ function replaceBranchInUrl(url, newBranch) {
     const subdomain = hostParts[0];
     const parts = subdomain.split('--');
     if (parts.length >= 3) {
-      // Replace the branch (first part), keep repo and org
+      // Replace the branch (first part), and swap repo/org when provided
       parts[0] = newBranch;
+      if (newRepo) parts[1] = newRepo;
+      if (newOrg) parts[2] = newOrg;
       hostParts[0] = parts.join('--');
       urlObj.hostname = hostParts.join('.');
     }
@@ -384,7 +400,7 @@ function replaceBranchInUrl(url, newBranch) {
  * - "milolibs": Add milolibs query parameter (default)
  * - "cloud": Replace branch in URL hostname
  */
-function buildTestUrls(testUrls, baseUrl, milolibs, prBranch) {
+function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo) {
   if (!Array.isArray(testUrls)) {
     console.error('testUrls must be an array');
     return [];
@@ -397,8 +413,8 @@ function buildTestUrls(testUrls, baseUrl, milolibs, prBranch) {
       let finalUrl = item.url;
       
       if (urlType === 'cloud' && prBranch) {
-        // Replace branch in the cloud URL
-        finalUrl = replaceBranchInUrl(item.url, prBranch);
+        // Replace branch in the cloud URL and update org/repo for forks
+        finalUrl = replaceBranchInUrl(item.url, prBranch, prOrg, prRepo);
       } else if (urlType === 'milolibs' && milolibs) {
         // Add milolibs parameter
         const urlObj = new URL(item.url);
@@ -426,6 +442,8 @@ async function main() {
   
   const milolibs = buildMilolibs();
   const prBranch = getPrBranch();
+  const prOrg = getPrOrg();
+  const prRepo = getPrRepo();
   const baseline = loadBaseline();
   const { thresholds, testUrls, runs = 3, throttle = 'none' } = baseline;
   
@@ -444,7 +462,7 @@ async function main() {
   
   // Merge baseline URLs with PR-specific URLs
   const allTestUrls = [...testUrls, ...prTestUrls];
-  const urlsToTest = buildTestUrls(allTestUrls, baseUrl, milolibs, prBranch);
+  const urlsToTest = buildTestUrls(allTestUrls, baseUrl, milolibs, prBranch, prOrg, prRepo);
   
   // Count URL types
   const cloudUrls = urlsToTest.filter(u => u.type === 'cloud');

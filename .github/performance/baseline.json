@@ -26,8 +26,9 @@
   },
   "testUrls": [
     {
-      "name": "Homepage",
-      "url": "https://main--homepage--adobecom.aem.live/homepage/index-loggedout"
+      "name": "CC JP",
+      "url": "https://main--cc--adobecom.aem.live/jp/creativecloud",
+      "type": "cloud"
     },
     {
       "name": "CC UK",
