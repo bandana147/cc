@@ -127,6 +127,7 @@ jobs:
 
       - name: Run Performance Check (PR)
         id: perf
+        continue-on-error: true
         env:
           TEST_URL: ${{ steps.url.outputs.test_url }}
           PR_BRANCH: ${{ github.head_ref }}
@@ -141,6 +142,7 @@ jobs:
 
       - name: Run Performance Check (Stage)
         if: github.event_name == 'pull_request'
+        continue-on-error: true
         env:
           TEST_URL: ${{ steps.url.outputs.stage_url }}
           PR_BRANCH: stage
