@@ -248,11 +248,14 @@ jobs:
                 
                 const urlVal = result?.url || base?.url || pageName;
                 const baseUrlVal = base?.url || '';
+                const urlCell = hasStage && baseUrlVal
+                  ? `${urlVal}<br>${baseUrlVal}`
+                  : urlVal;
                 
                 if (hasStage) {
-                  comment += `| ${urlVal} | ${baseUrlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
                 } else {
-                  comment += `| ${urlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
                 }
               }
               

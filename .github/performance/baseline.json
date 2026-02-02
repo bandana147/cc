@@ -1,7 +1,7 @@
 {
   "$schema": "./baseline.schema.json",
   "description": "Performance baseline thresholds for CC. Values are in milliseconds unless noted.",
-  "throttle": "none",
+  "throttle": "4g",
   "thresholds": {
     "lcp": {
       "budget": 2500,
@@ -37,5 +37,8 @@
     }
   ],
   "runs": 3,
-  "formFactor": "desktop"
+  "formFactor": "desktop",
+  "jsInclude": [
+    { "regex": "/milo\\/libs" }
+  ]
 }

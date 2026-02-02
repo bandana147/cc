@@ -105,7 +105,30 @@ const INIT_SCRIPT = `
 /**
  * Collect metrics from page - runs in browser context
  */
-function collectMetrics() {
+function collectMetrics(jsMatcherSpec) {
+  // Build matcher inside browser context
+  const makeMatcher = (spec) => {
+    if (!spec || !Array.isArray(spec.patterns) || !spec.patterns.length) return () => true;
+    
+    const compiled = spec.patterns.map((p) => {
+      if (p.type === 'regex' && p.pattern) {
+        try {
+          return { type: 'regex', re: new RegExp(p.pattern, p.flags || '') };
+        } catch (_) {
+          return null;
+        }
+      }
+      if (p.type === 'string' && typeof p.value === 'string') {
+        return { type: 'string', value: p.value };
+      }
+      return null;
+    }).filter(Boolean);
+    
+    if (!compiled.length) return () => true;
+    return (url) => compiled.some((p) => p.type === 'regex' ? p.re.test(url) : url.includes(p.value));
+  };
+  
+  const matchesJs = makeMatcher(jsMatcherSpec);
   const perf = window.__perfMetrics || {};
   const resources = performance.getEntriesByType('resource');
   
@@ -118,7 +141,7 @@ function collectMetrics() {
     const size = r.transferSize || 0;
     totalSize += size;
     
-    if (r.initiatorType === 'script' || r.name.endsWith('.js')) {
+    if ((r.initiatorType === 'script' || r.name.endsWith('.js')) && matchesJs(r.name)) {
       jsSize += size;
       jsResources.push({ name: r.name, size });
     }
@@ -141,7 +164,7 @@ function collectMetrics() {
   };
 }
 
-async function measureOnce(context, url, throttlePreset) {
+async function measureOnce(context, url, throttlePreset, jsMatcherSpec) {
   const page = await context.newPage();
   
   try {
@@ -157,7 +180,7 @@ async function measureOnce(context, url, throttlePreset) {
     // Wait for LCP to stabilize (typically within 2.5s after load)
     await page.waitForTimeout(2500);
     
-    return await page.evaluate(collectMetrics);
+    return await page.evaluate(collectMetrics, jsMatcherSpec);
   } finally {
     await page.close();
   }
@@ -173,14 +196,14 @@ function median(arr) {
   return sorted.length & 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
-async function runMeasurements(browser, url, runs, throttlePreset) {
+async function runMeasurements(browser, url, runs, throttlePreset, jsMatcherSpec) {
   const results = [];
   const context = await browser.newContext({ viewport: { width: 1920, height: 1080 } });
   
   try {
     for (let i = 0; i < runs; i++) {
       try {
-        const metrics = await measureOnce(context, url, throttlePreset);
+        const metrics = await measureOnce(context, url, throttlePreset, jsMatcherSpec);
         results.push(metrics);
         console.log(`  Run ${i + 1}/${runs}: LCP=${metrics.lcp?.toFixed(0) ?? 'N/A'}ms, CLS=${metrics.cls.toFixed(3)}, TBT=${metrics.tbt.toFixed(0)}ms`);
       } catch (err) {
@@ -221,7 +244,7 @@ async function runMeasurements(browser, url, runs, throttlePreset) {
 /**
  * Run tests with controlled concurrency
  */
-async function runWithConcurrency(browser, urlsToTest, runs, concurrency, throttlePreset) {
+async function runWithConcurrency(browser, urlsToTest, runs, concurrency, throttlePreset, jsMatcherSpec) {
   const results = [];
   const queue = [...urlsToTest];
   const inFlight = new Set();
@@ -233,7 +256,7 @@ async function runWithConcurrency(browser, urlsToTest, runs, concurrency, thrott
     console.log(`\n📍 Testing: ${name}`);
     
     try {
-      const result = await runMeasurements(browser, url, runs, throttlePreset);
+      const result = await runMeasurements(browser, url, runs, throttlePreset, jsMatcherSpec);
       result.name = name;
       results.push(result);
     } catch (err) {
@@ -400,6 +423,29 @@ function replaceBranchInUrl(url, newBranch, newOrg, newRepo) {
  * - "milolibs": Add milolibs query parameter (default)
  * - "cloud": Replace branch in URL hostname
  */
+function buildJsMatcherSpec(jsInclude) {
+  if (!Array.isArray(jsInclude) || !jsInclude.length) return null;
+  
+  const patterns = [];
+  for (const entry of jsInclude) {
+    if (typeof entry === 'string') {
+      patterns.push({ type: 'string', value: entry });
+      continue;
+    }
+    if (entry && typeof entry === 'object' && entry.regex) {
+      try {
+        // Validate regex
+        new RegExp(entry.regex, entry.flags || '');
+        patterns.push({ type: 'regex', pattern: entry.regex, flags: entry.flags || '' });
+      } catch (e) {
+        console.warn(`Warning: Skipping invalid regex in jsInclude: ${entry.regex} (${e.message})`);
+      }
+    }
+  }
+  
+  return patterns.length ? { patterns } : null;
+}
+
 function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo) {
   if (!Array.isArray(testUrls)) {
     console.error('testUrls must be an array');
@@ -447,7 +493,7 @@ async function main() {
   const prOrg = variantName === 'Stage' ? null : getPrOrg();
   const prRepo = variantName === 'Stage' ? null : getPrRepo();
   const baseline = loadBaseline();
-  const { thresholds, testUrls, runs = 3, throttle = 'none' } = baseline;
+  const { thresholds, testUrls, runs = 3, throttle = 'none', jsInclude } = baseline;
   
   // Parse PR-specific test URLs from environment variable
   let prTestUrls = [];
@@ -470,6 +516,9 @@ async function main() {
   const allTestUrls = [...testUrls, ...prTestUrls];
   const urlsToTest = buildTestUrls(allTestUrls, baseUrl, milolibs, prBranch, prOrg, prRepo);
   
+  // Build JS include matcher (optional)
+  const jsMatcherSpec = buildJsMatcherSpec(jsInclude);
+  
   // Count URL types
   const cloudUrls = urlsToTest.filter(u => u.type === 'cloud');
   const milolibsUrls = urlsToTest.filter(u => u.type === 'milolibs');
@@ -489,6 +538,11 @@ async function main() {
   } else {
     console.log('   Throttle: none');
   }
+  if (jsMatcherSpec?.patterns?.length) {
+    console.log(`   JS include filters: ${jsMatcherSpec.patterns.length} matcher(s)`);
+  } else {
+    console.log('   JS include filters: none (capturing all JS)');
+  }
   
   const browser = await chromium.launch({
     headless: true,
@@ -497,7 +551,7 @@ async function main() {
   
   let allResults;
   try {
-    allResults = await runWithConcurrency(browser, urlsToTest, runs, MAX_CONCURRENCY, throttlePreset);
+    allResults = await runWithConcurrency(browser, urlsToTest, runs, MAX_CONCURRENCY, throttlePreset, jsMatcherSpec);
   } finally {
     await browser.close();
   }
