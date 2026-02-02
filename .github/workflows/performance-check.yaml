@@ -186,9 +186,7 @@ jobs:
               comment += '⚠️ Performance results not available.\n';
             } else {
               const { results: prResults, thresholds, passed } = prData;
-              
-              comment += `**Test URL:** ${{ steps.url.outputs.test_url }}\n\n`;
-              
+                            
               if (passed) {
                 comment += '### ✅ All metrics within budget!\n\n';
               } else {
