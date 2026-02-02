@@ -244,7 +244,7 @@ function overrideForReducedMotion(paramsList, headerParams) {
     return;
   }
 
-  // Override image params
+  // Override image param
   paramsList.forEach((params) => {
     Object.keys(params).forEach((viewport) => {
       // All images appear immediately with no scaling
