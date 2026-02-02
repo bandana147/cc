@@ -260,7 +260,7 @@ jobs:
                 { label: 'PR', data: prResults },
               ];
               if (hasStage) {
-                variants.push({ label: 'Stage', data: stageResults });
+                variants.push({ label: 'Base', data: stageResults });
               }
               
               for (const variant of variants) {
