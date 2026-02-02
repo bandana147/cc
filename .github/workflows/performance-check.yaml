@@ -228,11 +228,12 @@ jobs:
                 const sign = delta > 0 ? '+' : '';
                 return `${prStr} / ${stStr} / ${sign}${fmt(delta)}`;
               };
+              const overBudget = (val, key) => val != null && thresholds?.[key]?.budget != null && val > thresholds[key].budget;
+              const mark = (val, key, cell) => overBudget(val, key) ? `❌ ${cell}` : cell;
               
               for (const [pageName, { pr: result, stage: base }] of byName) {
                 const fmtMs = (v) => `${Math.round(v)}ms`;
                 const fmtCls = (v) => v.toFixed(3);
-                const fmtKb = (v) => `${(v).toFixed(1)}KB`;
                 
                 const lcpCell = hasStage
                   ? `${formatDelta(result?.lcp, base?.lcp, fmtMs)}`
@@ -243,6 +244,11 @@ jobs:
                 const tbtCell = hasStage
                   ? `${formatDelta(result?.tbt, base?.tbt, fmtMs)}`
                   : `${result?.tbt ? Math.round(result.tbt) : 'N/A'}ms`;
+                
+                const lcpOut = mark(result?.lcp, 'lcp', lcpCell);
+                const clsOut = mark(result?.cls, 'cls', clsCell);
+                const tbtOut = mark(result?.tbt, 'tbt', tbtCell);
+                
                 const urlVal = result?.url || base?.url || pageName;
                 const baseUrlVal = base?.url || '';
                 const urlCell = hasStage
@@ -250,9 +256,9 @@ jobs:
                   : urlVal;
                 
                 if (hasStage) {
-                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpOut} | ${clsOut} | ${tbtOut} |\n`;
                 } else {
-                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpOut} | ${clsOut} | ${tbtOut} |\n`;
                 }
               }
               
