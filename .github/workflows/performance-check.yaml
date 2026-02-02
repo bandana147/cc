@@ -197,8 +197,8 @@ jobs:
               const hasStage = !!stageData;
               
               if (hasStage) {
-                comment += '| PR URL | Base URL | LCP ms (PR/Base/Δ) | CLS (PR/Base/Δ) | TBT ms (PR/Base/Δ) | JS KB (PR/Base/Δ) |\n';
-                comment += '|--------|----------|--------------------|-----------------|--------------------|-------------------|\n';
+                comment += '| URLs (PR / Base) | LCP ms (PR/Base/Δ) | CLS (PR/Base/Δ) | TBT ms (PR/Base/Δ) | JS KB (PR/Base/Δ) |\n';
+                comment += '|------------------|--------------------|-----------------|--------------------|-------------------|\n';
               } else {
                 comment += '| URL | LCP ms | CLS | TBT ms | JS KB |\n';
                 comment += '|-----|--------|-----|--------|-------|\n';
@@ -248,11 +248,14 @@ jobs:
                 
                 const urlVal = result?.url || base?.url || pageName;
                 const baseUrlVal = base?.url || '';
+                const urlCell = hasStage && baseUrlVal
+                  ? `${urlVal}<br>${baseUrlVal}`
+                  : urlVal;
                 
                 if (hasStage) {
-                  comment += `| ${urlVal} | ${baseUrlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
                 } else {
-                  comment += `| ${urlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
                 }
               }
               
