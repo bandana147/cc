@@ -415,7 +415,7 @@ function buildTestUrls(testUrls, baseUrl, milolibs, prBranch, prOrg, prRepo) {
       if (urlType === 'cloud' && prBranch) {
         // Replace branch in the cloud URL and update org/repo for forks
         finalUrl = replaceBranchInUrl(item.url, prBranch, prOrg, prRepo);
-      } else if (urlType === 'milolibs' && milolibs) {
+      } else if (urlType === 'milolibs' && milolibs && !item.skipMilolibs) {
         // Add milolibs parameter
         const urlObj = new URL(item.url);
         urlObj.searchParams.set('milolibs', milolibs);
@@ -453,7 +453,11 @@ async function main() {
   let prTestUrls = [];
   if (process.env.PR_TEST_URLS) {
     try {
-      prTestUrls = JSON.parse(process.env.PR_TEST_URLS);
+      prTestUrls = JSON.parse(process.env.PR_TEST_URLS).map((u) => ({
+        ...u,
+        // Do not inject milolibs into PR-specified URLs
+        skipMilolibs: true,
+      }));
       if (prTestUrls.length) {
         console.log(`📋 Found ${prTestUrls.length} PR-specific test URLs`);
       }

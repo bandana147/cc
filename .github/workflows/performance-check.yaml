@@ -68,12 +68,12 @@ jobs:
             echo "Using PR preview URL: $URL"
           fi
           
-          # Stage branch preview (for comparison)
+          # Main branch preview (for comparison)
           BASE_ORG="${{ github.event.pull_request.base.repo.owner.login || github.repository_owner }}"
           BASE_REPO="${{ github.event.pull_request.base.repo.name || github.event.repository.name }}"
-          STAGE_URL="https://stage--${BASE_REPO}--${BASE_ORG}.aem.live"
+          STAGE_URL="https://main--${BASE_REPO}--${BASE_ORG}.aem.live"
           echo "stage_url=$STAGE_URL" >> $GITHUB_OUTPUT
-          echo "Stage comparison URL: $STAGE_URL"
+          echo "Main comparison URL: $STAGE_URL"
 
       - name: Wait for deployment
         if: github.event_name != 'workflow_dispatch'
@@ -145,7 +145,7 @@ jobs:
         continue-on-error: true
         env:
           TEST_URL: ${{ steps.url.outputs.stage_url }}
-          PR_BRANCH: stage
+          PR_BRANCH: main
           PR_ORG: ${{ github.event.pull_request.base.repo.owner.login || github.repository_owner }}
           PR_REPO: ${{ github.event.pull_request.base.repo.name || github.event.repository.name }}
           RESULTS_PATH: .github/performance/results-stage.json
