@@ -197,11 +197,11 @@ jobs:
               const hasStage = !!stageData;
               
               if (hasStage) {
-                comment += '| URLs (PR / Base) | LCP ms (PR/Base/Δ) | CLS (PR/Base/Δ) | TBT ms (PR/Base/Δ) | JS KB (PR/Base/Δ) |\n';
-                comment += '|------------------|--------------------|-----------------|--------------------|-------------------|\n';
+                comment += '| URLs (PR / Base) | LCP ms (PR/Base/Δ) | CLS (PR/Base/Δ) | TBT ms (PR/Base/Δ) |\n';
+                comment += '|------------------|--------------------|-----------------|--------------------|\n';
               } else {
-                comment += '| URL | LCP ms | CLS | TBT ms | JS KB |\n';
-                comment += '|-----|--------|-----|--------|-------|\n';
+                comment += '| URL | LCP ms | CLS | TBT ms |\n';
+                comment += '|-----|--------|-----|--------|\n';
               }
               
               const stageResults = hasStage ? stageData.results : [];
@@ -242,20 +242,16 @@ jobs:
                 const tbtCell = hasStage
                   ? `${formatDelta(result?.tbt, base?.tbt, fmtMs)}`
                   : `${result?.tbt ? Math.round(result.tbt) : 'N/A'}ms`;
-                const jsCell = hasStage
-                  ? `${formatDelta(result?.jsSize, base?.jsSize, fmtKb)}`
-                  : `${result?.jsSize}KB`;
-                
                 const urlVal = result?.url || base?.url || pageName;
                 const baseUrlVal = base?.url || '';
-                const urlCell = hasStage && baseUrlVal
-                  ? `${urlVal}<br>${baseUrlVal}`
+                const urlCell = hasStage
+                  ? `PR: ${urlVal}<br>Base: ${baseUrlVal || 'N/A'}`
                   : urlVal;
                 
                 if (hasStage) {
-                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} |\n`;
                 } else {
-                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                  comment += `| ${urlCell} | ${lcpCell} | ${clsCell} | ${tbtCell} |\n`;
                 }
               }
               
