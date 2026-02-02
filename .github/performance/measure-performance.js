@@ -138,9 +138,9 @@ function collectMetrics(jsMatcherSpec) {
   const jsResources = [];
   
   for (const r of resources) {
-    // transferSize is 0 when the response is cached or cross-origin without TAO;
-    // fall back to encoded/decoded sizes to avoid reporting 0KB.
-    const size = r.transferSize || r.encodedBodySize || r.decodedBodySize || 0;
+    // Prefer decoded body size (uncompressed bytes actually executed by the browser).
+    // Fallback to encoded and transfer sizes (includes headers) to avoid 0KB on cache/TAO.
+    const size = r.decodedBodySize || r.encodedBodySize || r.transferSize || 0;
     totalSize += size;
     
     if ((r.initiatorType === 'script' || r.name.endsWith('.js')) && matchesJs(r.name)) {
