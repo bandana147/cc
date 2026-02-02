@@ -104,25 +104,26 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const body = context.payload.pull_request?.body || '';
-            const match = body.match(/\[test-urls\]([\s\S]*?)\[\/test-urls\]/);
-            if (!match) {
+            const body = (context.payload.pull_request?.body || '').split('\n');
+            const start = body.findIndex(line => line.trim().toLowerCase().startsWith('pr urls:'));
+            if (start === -1) {
               core.setOutput('urls', '');
-              console.log('No [test-urls] block found in PR description');
+              console.log('No PR URLs section found (expecting lines after "PR Urls:")');
               return;
             }
-            
-            const lines = match[1].trim().split('\n').filter(l => l.trim());
-            const urls = lines.map(line => {
-              const parts = line.split('|').map(p => p.trim());
-              const url = parts[0];
-              const type = parts[1] || 'milolibs';
-              const name = parts[2] || url;
-              return { name, url, type };
-            });
-            
+
+            // Collect bullet lines after "PR Urls:" until a blank line or non-bullet is hit
+            const urls = [];
+            for (let i = start + 1; i < body.length; i++) {
+              const line = body[i];
+              if (!line.trim()) break;
+              if (!/^\s*[-*]/.test(line)) break;
+              const url = line.replace(/^\s*[-*]\s*/, '').trim();
+              if (url) urls.push({ name: url, url, type: 'milolibs' });
+            }
+
             console.log(`Found ${urls.length} PR-specific test URLs`);
-            urls.forEach(u => console.log(`  - ${u.name} (${u.type}): ${u.url}`));
+            urls.forEach(u => console.log(`  - ${u.url}`));
             core.setOutput('urls', JSON.stringify(urls));
 
       - name: Run Performance Check (PR)
