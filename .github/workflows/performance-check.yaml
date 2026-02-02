@@ -197,11 +197,11 @@ jobs:
               const hasStage = !!stageData;
               
               if (hasStage) {
-                comment += '| Page (URL) | LCP (PR / Stage / Δ) | CLS (PR / Stage / Δ) | TBT (PR / Stage / Δ) | JS Size KB (PR / Stage / Δ) |\n';
-                comment += '|------------|----------------------|----------------------|----------------------|------------------------------|\n';
+                comment += '| URL | LCP (PR / Stage / Δ) | CLS (PR / Stage / Δ) | TBT (PR / Stage / Δ) | JS Size KB (PR / Stage / Δ) |\n';
+                comment += '|-----|----------------------|----------------------|----------------------|------------------------------|\n';
               } else {
-                comment += '| Page (URL) | LCP | CLS | TBT | JS Size |\n';
-                comment += '|------------|-----|-----|-----|---------|\n';
+                comment += '| URL | LCP | CLS | TBT | JS Size |\n';
+                comment += '|-----|-----|-----|-----|---------|\n';
               }
               
               const stageResults = hasStage ? stageData.results : [];
@@ -246,10 +246,9 @@ jobs:
                   ? `${formatDelta(result?.jsSize, base?.jsSize, fmtKb)}`
                   : `${result?.jsSize}KB`;
                 
-                const urlVal = result?.url || base?.url || '';
-                const pageCell = urlVal ? `${pageName} (${urlVal})` : pageName;
+                const urlVal = result?.url || base?.url || pageName;
                 
-                comment += `| ${pageCell} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
+                comment += `| ${urlVal} | ${lcpCell} | ${clsCell} | ${tbtCell} | ${jsCell} |\n`;
               }
               
               comment += '\n<details>\n<summary>📦 Heaviest resources (top 5 per page)</summary>\n\n';
