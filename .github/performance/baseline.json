@@ -27,12 +27,12 @@
   "testUrls": [
     {
       "name": "Homepage",
-      "url": "https://main--homepage--adobecom.aem.live/homepage/index-loggedout",
-      "type": "milolibs"
+      "url": "https://main--homepage--adobecom.aem.live/homepage/index-loggedout"
     },
     {
       "name": "CC UK",
-      "url": "https://main--cc--adobecom.aem.live/uk/creativecloud"
+      "url": "https://main--cc--adobecom.aem.live/uk/creativecloud",
+      "type": "cloud"
     }
   ],
   "runs": 3,
