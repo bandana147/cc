@@ -1,6 +1,6 @@
 // Animated Photo Banner Component
 // Provides animated image galleries with wave-based animations and responsive behavior
-// TODO: Write a more detailed authoring document in repo
+// TODO: Write a more detailed authoring document in rep
 
 import { createTag, getScreenSizeCategory, prefersReducedMotion } from '../../scripts/utils.js';
 
@@ -244,7 +244,7 @@ function overrideForReducedMotion(paramsList, headerParams) {
     return;
   }
 
-  // Override image params
+  // Override image param
   paramsList.forEach((params) => {
     Object.keys(params).forEach((viewport) => {
       // All images appear immediately with no scaling
@@ -258,7 +258,7 @@ function overrideForReducedMotion(paramsList, headerParams) {
   if (headerParams) {
     Object.keys(headerParams).forEach((viewport) => {
       if (headerParams[viewport]) {
-        // Make header appear immediately
+        // Make header appear immediately.
         headerParams[viewport].wave = 0;
       }
     });
