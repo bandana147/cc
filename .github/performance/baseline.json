@@ -36,6 +36,7 @@
       "type": "cloud"
     }
   ],
+  "baseBranch": "main",
   "runs": 3,
   "formFactor": "desktop",
   "jsInclude": [
