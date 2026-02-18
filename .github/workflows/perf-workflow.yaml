@@ -4,6 +4,10 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 
+# Required by adobecom/perf-metrics reusable workflow (comments on PRs)
+permissions:
+  pull-requests: write
+
 jobs:
   # Run the full performance check (LCP, CLS, TBT, etc.) and comment results
   performance-check:
